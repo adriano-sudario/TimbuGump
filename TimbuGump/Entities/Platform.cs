@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Threading;
 using TimbuGump.Entities.Sprites;
 
 namespace TimbuGump.Entities
@@ -15,19 +16,7 @@ namespace TimbuGump.Entities
 
         public Platform(Platform lastPlatform) : this(Vector2.Zero)
         {
-            Random random = new Random();
-            int[] possibleVerticalDistances = new int[] { 20, 30, 40, 50 };
-            int verticalDistance = possibleVerticalDistances[random.Next(possibleVerticalDistances.Length)];
-
-            int[] possibleHorizontalDistances = new int[(verticalDistance / 10) + 1];
-            int minimumHorizontalDistance = 100;
-
-            for (int i = 0; i < possibleHorizontalDistances.Length; i ++)
-                possibleHorizontalDistances[i] = minimumHorizontalDistance + (i * 10);
-
-            int horizontalDistance = possibleHorizontalDistances[random.Next(possibleHorizontalDistances.Length)];
-
-            MoveTo(new Vector2(lastPlatform.Position.X + lastPlatform.Width + horizontalDistance, lastPlatform.Position.Y - verticalDistance));
+            MoveTo(GetPositionUp(lastPlatform));
         }
 
         public Platform(Vector2 position) : base(position, sprite: GetSprite(position), scale: 1f)
@@ -39,6 +28,28 @@ namespace TimbuGump.Entities
         {
             Random random = new Random();
             return new Sprite(Global.PlatformTexture, new Rectangle((int)position.X, (int)position.Y, 400, 5));
+        }
+
+        private Vector2 GetPositionUp(Platform lastPlatform)
+        {
+            Random random = new Random();
+            int[] possibleVerticalDistances = new int[] { 20, 30, 40, 50 };
+            int verticalDistanceIndex = random.Next(possibleVerticalDistances.Length);
+            verticalDistanceIndex = 0;
+            int verticalDistance = possibleVerticalDistances[verticalDistanceIndex];
+
+            if (lastPlatform.Position.Y - verticalDistance <= 100)
+            {
+                verticalDistanceIndex = 0;
+                verticalDistance = 100 - (int)lastPlatform.Position.Y;
+            }
+
+            int[] possibleHorizontalDistances = new int[] { 100, 110, 120, 130, 140, 150, 160 };
+            int horizontalDistanceMaximumIndex = possibleHorizontalDistances.Length - possibleVerticalDistances.Length + 
+                (possibleVerticalDistances.Length - MathHelper.Clamp(verticalDistanceIndex - 1, 0, possibleVerticalDistances.Length));
+            int horizontalDistance = possibleHorizontalDistances[random.Next(horizontalDistanceMaximumIndex)];
+
+            return new Vector2(lastPlatform.Position.X + lastPlatform.Width + horizontalDistance, lastPlatform.Position.Y - verticalDistance);
         }
 
         public override void Update(GameTime gameTime)

@@ -29,7 +29,10 @@ namespace TimbuGump.Scenes
         {
             Platforms = new List<Platform>();
             Platforms.Add(new Platform());
-            Platforms.Add(new Platform(Platforms.First()));
+
+            for (int i = 0; i < 100; i++)
+                Platforms.Add(new Platform(Platforms.Last()));
+
             Player = new Timbu(Vector2.Zero);
             Player.MoveTo(new Vector2(25, Platforms.First().Position.Y - Player.Height));
         }
