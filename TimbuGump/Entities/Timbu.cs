@@ -5,6 +5,7 @@ using TimbuGump.Entities.Sprites;
 using TimbuGump.Helpers;
 using TimbuGump.Inputs;
 using TimbuGump.Interfaces;
+using TimbuGump.Sounds;
 
 namespace TimbuGump.Entities
 {
@@ -46,6 +47,7 @@ namespace TimbuGump.Entities
 
             if (input.InteractionJustPressed() && Ground != null && ForceApplied >= 0)
             {
+                Sfx.Play("pulo");
                 Ground = null;
                 ForceApplied = jumpForce * -1;
             }

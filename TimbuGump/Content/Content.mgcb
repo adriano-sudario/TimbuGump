@@ -25,3 +25,33 @@
 /processorParam:TextureFormat=Color
 /build:Graphics/8-bit_timbas.png
 
+#begin Sounds/SFX/afulibando_escada.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/SFX/afulibando_escada.wav
+
+#begin Sounds/SFX/pegando_ar.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/SFX/pegando_ar.wav
+
+#begin Sounds/SFX/pulando 2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/SFX/pulando 2.wav
+
+#begin Sounds/SFX/pulando.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/SFX/pulando.wav
+
+#begin Sounds/SFX/rodando.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/SFX/rodando.wav
+

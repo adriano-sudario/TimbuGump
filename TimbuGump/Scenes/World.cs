@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using TimbuGump.Abstracts;
 using TimbuGump.Entities;
+using TimbuGump.Helpers;
 using TimbuGump.Manipulators;
+using TimbuGump.Sounds;
 
 namespace TimbuGump.Scenes
 {
@@ -27,21 +29,14 @@ namespace TimbuGump.Scenes
 
         private void Initialize()
         {
+            Sfx.Load("pulo", Loader.LoadSound("SFX\\pulando"));
+
             Platforms = new List<Platform>();
             Platforms.Add(new Platform());
-
-            for (int i = 0; i < 100; i++)
-                Platforms.Add(new Platform(Platforms.Last()));
-
+            AddPlatforms();
             Player = new Timbu(Vector2.Zero);
             Player.MoveTo(new Vector2(25, Platforms.First().Position.Y - Player.Height));
         }
-
-        //private void AdjustCamera()
-        //{
-        //    Camera.AreaWidth = Place.Width;
-        //    Camera.AreaHeight = Place.Height;
-        //}
 
         public override void Update(GameTime gameTime)
         {
@@ -79,6 +74,42 @@ namespace TimbuGump.Scenes
                         break;
                     }
                 }
+            }
+
+            UpdatePlatforms();
+        }
+
+        private void UpdatePlatforms()
+        {
+            CleanPlatforms();
+            AddPlatforms();
+        }
+
+        private void CleanPlatforms()
+        {
+            int platformsToRemove = 0;
+
+            foreach (Platform platform in Platforms)
+            {
+                if (platform.Position.X + platform.Width < 0)
+                    platformsToRemove++;
+                else
+                    break;
+            }
+
+            if (platformsToRemove > 0)
+                Platforms.RemoveRange(0, platformsToRemove);
+        }
+
+        private void AddPlatforms()
+        {
+            Platform lastPlatform = Platforms.Last();
+
+            while (lastPlatform.Position.X + lastPlatform.Width < Global.ScreenWidth * 2)
+            {
+                Platform newPlatform = new Platform(lastPlatform);
+                Platforms.Add(newPlatform);
+                lastPlatform = newPlatform;
             }
         }
 

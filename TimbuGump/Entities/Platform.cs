@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Caieta;
+using Microsoft.Xna.Framework;
 using System;
 using System.Threading;
 using TimbuGump.Entities.Sprites;
@@ -7,49 +8,89 @@ namespace TimbuGump.Entities
 {
     public class Platform : Body
     {
-        private readonly float speed = 3f;
+        private readonly float speed = 4f;
 
-        public Platform() : this(Vector2.Zero)
+        public Platform() : base(Vector2.Zero, sprite: GetSprite())
         {
-            MoveTo(new Vector2(0, (Global.ScreenHeight * .5f) - 2.5f));
+            MoveTo(new Vector2(0, Global.ScreenHeight * .5f));
         }
 
-        public Platform(Platform lastPlatform) : this(Vector2.Zero)
+        public Platform(Platform lastPlatform) : base(Vector2.Zero, sprite: GetSprite())
         {
-            MoveTo(GetPositionUp(lastPlatform));
+            int[] directions = new int[] { -2, -1, 0, 1, 2 };
+
+            if (lastPlatform.Position.Y <= 100)
+                directions = new int[] { -1, -2, 0 };
+            else if (lastPlatform.Position.Y >= (Global.ScreenHeight * .5) + 100)
+                directions = new int[] { 0, 1, 2 };
+
+            int direction = directions[Calc.Random(directions.Length)];
+
+            Vector2 position;
+
+            if (direction < 0)
+                position = GetPositionDown(lastPlatform);
+            else if (direction > 0)
+                position = GetPositionUp(lastPlatform);
+            else
+                position = GetPositionMiddle(lastPlatform);
+
+            MoveTo(position);
         }
 
-        public Platform(Vector2 position) : base(position, sprite: GetSprite(position), scale: 1f)
+        private static Sprite GetSprite()
         {
-
-        }
-
-        private static Sprite GetSprite(Vector2 position)
-        {
-            Random random = new Random();
-            return new Sprite(Global.PlatformTexture, new Rectangle((int)position.X, (int)position.Y, 400, 5));
+            int[] possibleWidths = new int[] { 200, 400, 600, 800 };
+            return new Sprite(Global.PlatformTexture, new Rectangle(0, 0, possibleWidths[Calc.Random(possibleWidths.Length)], 5));
         }
 
         private Vector2 GetPositionUp(Platform lastPlatform)
         {
-            Random random = new Random();
-            int[] possibleVerticalDistances = new int[] { 20, 30, 40, 50 };
-            int verticalDistanceIndex = random.Next(possibleVerticalDistances.Length);
+            int[] possibleVerticalDistances = new int[] { 30, 40, 50, 60 };
+            int verticalDistanceIndex = Calc.Random(possibleVerticalDistances.Length);
             verticalDistanceIndex = 0;
             int verticalDistance = possibleVerticalDistances[verticalDistanceIndex];
 
             if (lastPlatform.Position.Y - verticalDistance <= 100)
             {
                 verticalDistanceIndex = 0;
-                verticalDistance = 100 - (int)lastPlatform.Position.Y;
+                verticalDistance = 0;
             }
 
             int[] possibleHorizontalDistances = new int[] { 100, 110, 120, 130, 140, 150, 160 };
-            int horizontalDistanceMaximumIndex = possibleHorizontalDistances.Length - possibleVerticalDistances.Length + 
+            int horizontalDistanceMaximumIndex = possibleHorizontalDistances.Length - possibleVerticalDistances.Length +
                 (possibleVerticalDistances.Length - MathHelper.Clamp(verticalDistanceIndex - 1, 0, possibleVerticalDistances.Length));
-            int horizontalDistance = possibleHorizontalDistances[random.Next(horizontalDistanceMaximumIndex)];
+            int horizontalDistance = possibleHorizontalDistances[Calc.Random(horizontalDistanceMaximumIndex)];
+            float horizontalPosition = lastPlatform.Position.X + lastPlatform.Width + horizontalDistance;
 
-            return new Vector2(lastPlatform.Position.X + lastPlatform.Width + horizontalDistance, lastPlatform.Position.Y - verticalDistance);
+            return new Vector2(horizontalPosition, lastPlatform.Position.Y - verticalDistance);
+        }
+
+        private Vector2 GetPositionMiddle(Platform lastPlatform)
+        {
+            int[] possibleHorizontalDistances = new int[] { 100, 110, 120, 130, 140, 150, 160 };
+            int horizontalDistance = possibleHorizontalDistances[Calc.Random(possibleHorizontalDistances.Length)];
+            float horizontalPosition = lastPlatform.Position.X + lastPlatform.Width + horizontalDistance;
+
+            return new Vector2(horizontalPosition, lastPlatform.Position.Y);
+        }
+
+        private Vector2 GetPositionDown(Platform lastPlatform)
+        {
+            int[] possibleVerticalDistances = new int[] { 30, 40, 50, 60, 70, 80, 90, 100 };
+            int verticalDistanceIndex = Calc.Random(possibleVerticalDistances.Length);
+            verticalDistanceIndex = 0;
+            int verticalDistance = possibleVerticalDistances[verticalDistanceIndex];
+            float verticalPosition = lastPlatform.Position.Y + lastPlatform.Height + verticalDistance;
+
+            if (verticalPosition >= (Global.ScreenHeight * .5) + 100)
+                verticalPosition = (Global.ScreenHeight * .5f) + 100;
+
+            int[] possibleHorizontalDistances = new int[] { 100, 110, 120, 130, 140, 150, 160, 170 };
+            int horizontalDistance = possibleHorizontalDistances[Calc.Random(possibleHorizontalDistances.Length)];
+            float horizontalPosition = lastPlatform.Position.X + lastPlatform.Width + horizontalDistance;
+
+            return new Vector2(horizontalPosition, verticalPosition);
         }
 
         public override void Update(GameTime gameTime)
