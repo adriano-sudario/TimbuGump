@@ -5,12 +5,15 @@ using TimbuGump.Entities.Sprites;
 using TimbuGump.Manipulators;
 using System;
 using static TimbuGump.Global;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace TimbuGump.Entities
 {
     public class Body : Cyclic
     {
         private Rectangle? customCollision;
+        private Dictionary<string, Rectangle> hitAreas = new Dictionary<string, Rectangle>();
 
         protected bool isActive = true;
 
@@ -21,6 +24,7 @@ namespace TimbuGump.Entities
         private float scale;
 
         public Sprite Sprite { get; private set; }
+
         public float Scale
         {
             get { return Sprite?.Scale ?? scale; }
@@ -31,7 +35,9 @@ namespace TimbuGump.Entities
                     Sprite.Scale = scale;
             }
         }
+
         public HorizontalDirection FacingDirection { get; set; }
+
         public virtual Vector2 Position
         {
             get { return Sprite?.Position ?? position; }
@@ -42,6 +48,7 @@ namespace TimbuGump.Entities
                     Sprite.Position = position;
             }
         }
+
         public Rectangle Collision
         {
             get
@@ -60,6 +67,7 @@ namespace TimbuGump.Entities
                 return collision;
             }
         }
+
         public float ScaleDefault { get; private set; }
         public virtual int Width { get { return (int)((Sprite?.Width ?? 0) * (Scale * ScreenScale)); } }
         public virtual int Height { get { return (int)((Sprite?.Height ?? 0) * (Scale * ScreenScale)); } }
@@ -151,16 +159,6 @@ namespace TimbuGump.Entities
                 MoveAndSlide(Sprite.Origin * totalScale);
         }
 
-        public void CustomizeCollision(Rectangle collision)
-        {
-            customCollision = collision;
-        }
-
-        public void ResetCollisionToSpriteBounds()
-        {
-            customCollision = null;
-        }
-
         public void FadeIn(float amount = .01f, EventHandler onFadeEnded = null)
         {
             Fade(Math.Abs(amount), 0, 1, onFadeEnded);
@@ -225,9 +223,39 @@ namespace TimbuGump.Entities
             });
         }
 
+        public void CustomizeCollision(Rectangle collision)
+        {
+            customCollision = collision;
+        }
+
+        public void ResetCollisionToSpriteBounds()
+        {
+            customCollision = null;
+        }
+
+        public void AddHitArea(string key, Rectangle area)
+        {
+            hitAreas.Add(key, area);
+        }
+
         public bool CollidesWith(Body body)
         {
             return Collision.Intersects(body.Collision);
+        }
+
+        public bool Collides(string hitAreaKey, Rectangle area)
+        {
+            return hitAreas[hitAreaKey].Intersects(area);
+        }
+
+        public bool Collides(string hitAreaKey, Body body, string bodyHitAreaKey)
+        {
+            return hitAreas[hitAreaKey].Intersects(body.GetHitArea(bodyHitAreaKey));
+        }
+
+        public Rectangle GetHitArea(string key)
+        {
+            return hitAreas[key];
         }
 
         protected void UpdateSize(GameTime gameTime)
@@ -268,6 +296,18 @@ namespace TimbuGump.Entities
                 return;
 
             Sprite?.Draw(spriteBatch, effect: FacingDirection == HorizontalDirection.Left ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+
+            if (Debugger.IsAttached)
+            {
+                Texture2D debugTexture = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+                debugTexture.SetData(new[] { new Color(154, 0, 0, 50) });
+
+                if (hitAreas.Count > 0)
+                    foreach (KeyValuePair<string, Rectangle> entry in hitAreas)
+                        spriteBatch.Draw(debugTexture, entry.Value, Color.Red);
+                else
+                    spriteBatch.Draw(debugTexture, Collision, Color.Red);
+            }
         }
     }
 }

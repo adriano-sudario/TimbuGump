@@ -43,10 +43,41 @@ namespace TimbuGump.Entities.Obstacles
             return new AnimatedSprite(spriteSheet, animationFrames);
         }
 
+        private void SplitBodies()
+        {
+            stair = new Stair(Vector2.Zero);
+            guy = new Guy(Vector2.Zero);
+            stick = new Stick(Vector2.Zero);
+
+            float platformVerticalPosition = fullBody.Position.Y + fullBody.Height;
+
+            stair.MoveTo(new Vector2(fullBody.Position.X, platformVerticalPosition - stair.Height));
+            guy.MoveTo(new Vector2(stair.Position.X + stair.Width - (1 * guy.Scale), stair.Position.Y - (5 * guy.Scale)));
+            stick.MoveTo(new Vector2(guy.Position.X + guy.Width, stair.Position.Y));
+
+            stair.SetOrigin(.5f);
+            guy.SetOrigin(.5f);
+            stick.SetOrigin(.5f);
+
+            stair.Spin(Global.HorizontalDirection.Left, 2f);
+            guy.Spin(Global.HorizontalDirection.Right);
+            stick.Spin(Global.HorizontalDirection.Left, 7f);
+
+            fullBody = null;
+        }
+
         public override void MoveTo(Vector2 position, bool setFacingDirection = true, bool keepOnScreenBounds = false)
         {
+            //if (fullBody != null)
+            //    fullBody.MoveTo(position, setFacingDirection, keepOnScreenBounds);
+            //else
+            //    MoveSplitEntities(position);
+
             if (fullBody != null)
+            {
                 fullBody.MoveTo(position, setFacingDirection, keepOnScreenBounds);
+                SplitBodies();
+            }
             else
                 MoveSplitEntities(position);
         }

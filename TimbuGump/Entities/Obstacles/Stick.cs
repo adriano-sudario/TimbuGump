@@ -8,6 +8,9 @@ namespace TimbuGump.Entities.Obstacles
 {
     class Stick : Body
     {
+        private readonly float gravity = 0.2f;
+        float forceApplied = -3f;
+
         public Stick(Vector2 position) : base(position, sprite: GetAnimationDefault(), scale: 5f)
         {
 
@@ -23,6 +26,14 @@ namespace TimbuGump.Entities.Obstacles
             });
 
             return new AnimatedSprite(spriteSheet, animationFrames);
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
+            forceApplied += gravity;
+
+            MoveAndSlide(new Vector2(5f, forceApplied));
         }
     }
 }
