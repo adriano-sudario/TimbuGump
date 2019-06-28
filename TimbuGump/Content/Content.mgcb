@@ -25,6 +25,18 @@
 /processorParam:TextureFormat=Color
 /build:Graphics/8-bit_timbas.png
 
+#begin Graphics/guy_on_stairs.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Graphics/guy_on_stairs.png
+
 #begin Sounds/SFX/afulibando_escada.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -54,4 +66,16 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sounds/SFX/rodando.wav
+
+#begin Sounds/Soundtrack/timbu_beat.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Soundtrack/timbu_beat.wav
+
+#begin Sounds/Soundtrack/timbu_beat_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/Soundtrack/timbu_beat_v2.wav
 

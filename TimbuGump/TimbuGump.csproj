@@ -44,7 +44,10 @@
   <ItemGroup>
     <Compile Include="Abstracts\Cyclic.cs" />
     <Compile Include="Entities\Body.cs" />
+    <Compile Include="Entities\Obstacles\Guy.cs" />
     <Compile Include="Entities\Obstacles\GuyOnStairs.cs" />
+    <Compile Include="Entities\Obstacles\Stair.cs" />
+    <Compile Include="Entities\Obstacles\Stick.cs" />
     <Compile Include="Entities\Platform.cs" />
     <Compile Include="Entities\Sprites\AnimatedSprite.cs" />
     <Compile Include="Entities\Sprites\Sprite.cs" />

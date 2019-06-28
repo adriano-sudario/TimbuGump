@@ -29,11 +29,13 @@ namespace TimbuGump.Scenes
 
         private void Initialize()
         {
+            SoundTrack.Load(Loader.LoadSound("Soundtrack\\timbu_beat"));
+            SoundTrack.Play();
             Sfx.Load("pulo", Loader.LoadSound("SFX\\pulando"));
 
             Platforms = new List<Platform>();
             Platforms.Add(new Platform());
-            AddPlatforms();
+            // AddPlatforms();
             Player = new Timbu(Vector2.Zero);
             Player.MoveTo(new Vector2(25, Platforms.First().Position.Y - Player.Height));
         }

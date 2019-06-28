@@ -32,10 +32,10 @@ namespace TimbuGump.Entities
             }
         }
         public HorizontalDirection FacingDirection { get; set; }
-        public Vector2 Position
+        public virtual Vector2 Position
         {
             get { return Sprite?.Position ?? position; }
-            private set
+            protected set
             {
                 position = value;
                 if (Sprite != null)
@@ -61,8 +61,8 @@ namespace TimbuGump.Entities
             }
         }
         public float ScaleDefault { get; private set; }
-        public int Width { get { return (int)((Sprite?.Width ?? 0) * (Scale * ScreenScale)); } }
-        public int Height { get { return (int)((Sprite?.Height ?? 0) * (Scale * ScreenScale)); } }
+        public virtual int Width { get { return (int)((Sprite?.Width ?? 0) * (Scale * ScreenScale)); } }
+        public virtual int Height { get { return (int)((Sprite?.Height ?? 0) * (Scale * ScreenScale)); } }
         public bool IsFading { get { return fade != null; } }
         public bool IsSpinning { get; private set; }
         public bool IsVisible { get; set; }
@@ -85,7 +85,7 @@ namespace TimbuGump.Entities
             this.customCollision = customCollision;
         }
 
-        public void MoveTo(Vector2 position, bool setFacingDirection = true, bool keepOnScreenBounds = false)
+        public virtual void MoveTo(Vector2 position, bool setFacingDirection = true, bool keepOnScreenBounds = false)
         {
             if (Position.X != position.X && setFacingDirection)
             {

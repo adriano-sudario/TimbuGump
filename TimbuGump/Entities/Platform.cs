@@ -1,18 +1,26 @@
 ﻿using Caieta;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using System.Threading;
+using TimbuGump.Entities.Obstacles;
 using TimbuGump.Entities.Sprites;
 
 namespace TimbuGump.Entities
 {
     public class Platform : Body
     {
-        private readonly float speed = 4f;
+        //private readonly float speed = 4f;
+        private readonly float speed = 0;
+        //private List<GuyOnStairs> guys = new List<GuyOnStairs>();
+        private GuyOnStairs guyOnStairs;
 
         public Platform() : base(Vector2.Zero, sprite: GetSprite())
         {
             MoveTo(new Vector2(0, Global.ScreenHeight * .5f));
+            guyOnStairs = new GuyOnStairs(Vector2.Zero);
+            guyOnStairs.MoveTo(new Vector2(300, Position.Y - guyOnStairs.Height));
         }
 
         public Platform(Platform lastPlatform) : base(Vector2.Zero, sprite: GetSprite())
@@ -41,7 +49,8 @@ namespace TimbuGump.Entities
         private static Sprite GetSprite()
         {
             int[] possibleWidths = new int[] { 200, 400, 600, 800 };
-            return new Sprite(Global.PlatformTexture, new Rectangle(0, 0, possibleWidths[Calc.Random(possibleWidths.Length)], 5));
+            //return new Sprite(Global.PlatformTexture, new Rectangle(0, 0, possibleWidths[Calc.Random(possibleWidths.Length)], 5));
+            return new Sprite(Global.PlatformTexture, new Rectangle(0, 0, possibleWidths[3], 5));
         }
 
         private Vector2 GetPositionUp(Platform lastPlatform)
@@ -96,6 +105,13 @@ namespace TimbuGump.Entities
         public override void Update(GameTime gameTime)
         {
             MoveAndSlide(new Vector2(-speed, 0));
+            guyOnStairs?.Update(gameTime);
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            base.Draw(spriteBatch);
+            guyOnStairs?.Draw(spriteBatch);
         }
     }
 }

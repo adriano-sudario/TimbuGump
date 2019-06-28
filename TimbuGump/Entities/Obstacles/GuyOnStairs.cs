@@ -1,16 +1,91 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
+using TimbuGump.Entities.Sprites;
+using TimbuGump.Helpers;
 
-//namespace TimbuGump.Entities.Obstacles
-//{
-//    public class GuyOnStairs : Body
-//    {
-//        public GuyOnStairs(Vector2 position) : base(position, sprite: GetAnimationDefault(), scale: 5f)
-//        {
+namespace TimbuGump.Entities.Obstacles
+{
+    public class GuyOnStairs : Body
+    {
+        Stair stair;
+        Guy guy;
+        Stick stick;
+        Body fullBody;
 
-//        }
-//    }
-//}
+        public override int Height => fullBody?.Height ?? (int)((stair.Position.Y + stair.Height - guy.Position.Y) * stair.Scale);
+        public override int Width => fullBody?.Width ?? (int)((stair.Position.X + stair.Width - guy.Position.X) * stair.Scale);
+
+        public GuyOnStairs(Vector2 position) : base(position)
+        {
+            fullBody = new Body(position, sprite: GetAnimationDefault(), scale: 5f);
+        }
+
+        private static Sprite GetAnimationDefault()
+        {
+            Texture2D spriteSheet = Loader.LoadTexture("guy_on_stairs");
+            Dictionary<string, Frame[]> animationFrames = new Dictionary<string, Frame[]>();
+            animationFrames.Add("idle", new Frame[]
+            {
+                new Frame() { Name = "idle_1", Source = new Rectangle(16, 0, 12, 16), Duration = 100 }
+            });
+
+            animationFrames.Add("catch", new Frame[]
+            {
+                new Frame() { Name = "catch_1", Source = new Rectangle(32, 0, 16, 16), Duration = 100 },
+                new Frame() { Name = "catch_2", Source = new Rectangle(48, 0, 16, 16), Duration = 100 },
+                new Frame() { Name = "catch_3", Source = new Rectangle(64, 0, 16, 16), Duration = 100 },
+                new Frame() { Name = "catch_4", Source = new Rectangle(80, 0, 16, 16), Duration = 100 },
+                new Frame() { Name = "catch_5", Source = new Rectangle(96, 0, 16, 16), Duration = 100 },
+                new Frame() { Name = "catch_6", Source = new Rectangle(112, 0, 16, 16), Duration = 100 }
+            });
+
+            return new AnimatedSprite(spriteSheet, animationFrames);
+        }
+
+        public override void MoveTo(Vector2 position, bool setFacingDirection = true, bool keepOnScreenBounds = false)
+        {
+            if (fullBody != null)
+                fullBody.MoveTo(position, setFacingDirection, keepOnScreenBounds);
+            else
+                MoveSplitEntities(position);
+        }
+
+        private void MoveSplitEntities(Vector2 position, bool setFacingDirection = true, bool keepOnScreenBounds = false)
+        {
+            stair?.MoveTo(position, setFacingDirection, keepOnScreenBounds);
+            guy?.MoveTo(position, setFacingDirection, keepOnScreenBounds);
+            stick?.MoveTo(position, setFacingDirection, keepOnScreenBounds);
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            if (fullBody != null)
+                fullBody.Update(gameTime);
+            else
+                UpdateSplitEntities(gameTime);
+        }
+
+        private void UpdateSplitEntities(GameTime gameTime)
+        {
+            stair.Update(gameTime);
+            guy.Update(gameTime);
+            stick.Update(gameTime);
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            if (fullBody != null)
+                fullBody.Draw(spriteBatch);
+            else
+                DrawSplitEntities(spriteBatch);
+        }
+
+        private void DrawSplitEntities(SpriteBatch spriteBatch)
+        {
+            stair.Draw(spriteBatch);
+            guy.Draw(spriteBatch);
+            stick.Draw(spriteBatch);
+        }
+    }
+}
