@@ -93,6 +93,40 @@ namespace TimbuGump.Entities
             this.customCollision = customCollision;
         }
 
+        private void UpdateHitAreas()
+        {
+            //for (int i = 0; i < hitAreas.Count; i++)
+            //    hitAreas[hitAreas..Key] = new Rectangle(
+            //        area.Value.X + (int)Position.X,
+            //        area.Value.X + (int)Position.X,
+            //        area.Value.Width,
+            //        area.Value.Height);
+
+            KeyValuePair<string, Rectangle>[] entries = new KeyValuePair<string, Rectangle>[hitAreas.Count];
+
+            //foreach (KeyValuePair<string, Rectangle> area in hitAreas)
+            //    hitAreas[area.Key] = new Rectangle(
+            //        area.Value.X + (int)Position.X, 
+            //        area.Value.X + (int)Position.X, 
+            //        area.Value.Width, 
+            //        area.Value.Height);
+
+            int index = 0;
+
+            foreach (KeyValuePair<string, Rectangle> area in hitAreas)
+            {
+                entries[index] = new KeyValuePair<string, Rectangle>(area.Key, new Rectangle(
+                    area.Value.X + (int)Position.X,
+                    area.Value.X + (int)Position.X,
+                    area.Value.Width,
+                    area.Value.Height));
+                index++;
+            }
+
+            for (int i = 0; i < entries.Length; i++)
+                hitAreas[entries[i].Key] = entries[i].Value;
+        }
+
         public virtual void MoveTo(Vector2 position, bool setFacingDirection = true, bool keepOnScreenBounds = false)
         {
             if (Position.X != position.X && setFacingDirection)
@@ -108,6 +142,7 @@ namespace TimbuGump.Entities
             }
             
             Position = position;
+            UpdateHitAreas();
         }
 
         public void MoveTo(int x, int y, bool setFacingDirection = true, bool keepOnScreenBounds = false)
@@ -235,6 +270,7 @@ namespace TimbuGump.Entities
 
         public void AddHitArea(string key, Rectangle area)
         {
+            UpdateHitAreas();
             hitAreas.Add(key, area);
         }
 

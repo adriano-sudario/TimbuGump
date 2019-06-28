@@ -19,6 +19,13 @@ namespace TimbuGump.Entities.Obstacles
         public GuyOnStairs(Vector2 position) : base(position)
         {
             fullBody = new Body(position, sprite: GetAnimationDefault(), scale: 5f);
+            fullBody.AddHitArea("stair_weak_point", 
+                new Rectangle(
+                    (int)(fullBody.Position.X - (2 * fullBody.Scale)), 
+                    (int)(fullBody.Position.Y + (11 * fullBody.Scale)), 
+                    (int)(5 * fullBody.Scale), 
+                    (int)(6 * fullBody.Scale)
+                    ));
         }
 
         private static Sprite GetAnimationDefault()
@@ -68,16 +75,8 @@ namespace TimbuGump.Entities.Obstacles
 
         public override void MoveTo(Vector2 position, bool setFacingDirection = true, bool keepOnScreenBounds = false)
         {
-            //if (fullBody != null)
-            //    fullBody.MoveTo(position, setFacingDirection, keepOnScreenBounds);
-            //else
-            //    MoveSplitEntities(position);
-
             if (fullBody != null)
-            {
                 fullBody.MoveTo(position, setFacingDirection, keepOnScreenBounds);
-                SplitBodies();
-            }
             else
                 MoveSplitEntities(position);
         }
