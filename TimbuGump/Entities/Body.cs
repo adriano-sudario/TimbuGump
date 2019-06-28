@@ -7,6 +7,7 @@ using System;
 using static TimbuGump.Global;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace TimbuGump.Entities
 {
@@ -93,31 +94,17 @@ namespace TimbuGump.Entities
             this.customCollision = customCollision;
         }
 
-        private void UpdateHitAreas()
+        private void UpdateHitAreas(Vector2 position)
         {
-            //for (int i = 0; i < hitAreas.Count; i++)
-            //    hitAreas[hitAreas..Key] = new Rectangle(
-            //        area.Value.X + (int)Position.X,
-            //        area.Value.X + (int)Position.X,
-            //        area.Value.Width,
-            //        area.Value.Height);
-
             KeyValuePair<string, Rectangle>[] entries = new KeyValuePair<string, Rectangle>[hitAreas.Count];
-
-            //foreach (KeyValuePair<string, Rectangle> area in hitAreas)
-            //    hitAreas[area.Key] = new Rectangle(
-            //        area.Value.X + (int)Position.X, 
-            //        area.Value.X + (int)Position.X, 
-            //        area.Value.Width, 
-            //        area.Value.Height);
 
             int index = 0;
 
             foreach (KeyValuePair<string, Rectangle> area in hitAreas)
             {
                 entries[index] = new KeyValuePair<string, Rectangle>(area.Key, new Rectangle(
-                    area.Value.X + (int)Position.X,
-                    area.Value.X + (int)Position.X,
+                    area.Value.X + (int)(Position.X - position.X),
+                    area.Value.Y + (int)(Position.Y - position.Y),
                     area.Value.Width,
                     area.Value.Height));
                 index++;
@@ -142,7 +129,7 @@ namespace TimbuGump.Entities
             }
             
             Position = position;
-            UpdateHitAreas();
+            UpdateHitAreas(position);
         }
 
         public void MoveTo(int x, int y, bool setFacingDirection = true, bool keepOnScreenBounds = false)
@@ -270,7 +257,7 @@ namespace TimbuGump.Entities
 
         public void AddHitArea(string key, Rectangle area)
         {
-            UpdateHitAreas();
+            UpdateHitAreas(Position);
             hitAreas.Add(key, area);
         }
 
@@ -291,7 +278,8 @@ namespace TimbuGump.Entities
 
         public Rectangle GetHitArea(string key)
         {
-            return hitAreas[key];
+            Rectangle hitArea = hitAreas[key];
+            return new Rectangle((int)(hitArea.X + Position.X), (int)(hitArea.Y + Position.Y), hitArea.Width, hitArea.Height);
         }
 
         protected void UpdateSize(GameTime gameTime)
@@ -339,8 +327,8 @@ namespace TimbuGump.Entities
                 debugTexture.SetData(new[] { new Color(154, 0, 0, 50) });
 
                 if (hitAreas.Count > 0)
-                    foreach (KeyValuePair<string, Rectangle> entry in hitAreas)
-                        spriteBatch.Draw(debugTexture, entry.Value, Color.Red);
+                    foreach (KeyValuePair<string, Rectangle> area in hitAreas)
+                        spriteBatch.Draw(debugTexture, GetHitArea(area.Key), Color.Red);
                 else
                     spriteBatch.Draw(debugTexture, Collision, Color.Red);
             }

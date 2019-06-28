@@ -19,12 +19,20 @@ namespace TimbuGump.Entities.Obstacles
         public GuyOnStairs(Vector2 position) : base(position)
         {
             fullBody = new Body(position, sprite: GetAnimationDefault(), scale: 5f);
-            fullBody.AddHitArea("stair_weak_point", 
+            fullBody.AddHitArea("destroy_area",
                 new Rectangle(
-                    (int)(fullBody.Position.X - (2 * fullBody.Scale)), 
-                    (int)(fullBody.Position.Y + (11 * fullBody.Scale)), 
-                    (int)(5 * fullBody.Scale), 
+                    (int)(-2 * fullBody.Scale),
+                    (int)(10 * fullBody.Scale),
+                    (int)(5 * fullBody.Scale),
                     (int)(6 * fullBody.Scale)
+                    ));
+
+            fullBody.AddHitArea("catch_area",
+                new Rectangle(
+                    (int)(5 * fullBody.Scale),
+                    (int)(11 * fullBody.Scale),
+                    (int)(10 * fullBody.Scale),
+                    (int)(5 * fullBody.Scale)
                     ));
         }
 
