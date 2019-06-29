@@ -50,7 +50,7 @@ namespace TimbuGump.Entities
             }
         }
 
-        public Rectangle Collision
+        public Rectangle Boundings
         {
             get
             {
@@ -263,17 +263,22 @@ namespace TimbuGump.Entities
 
         public bool CollidesWith(Body body)
         {
-            return Collision.Intersects(body.Collision);
+            return Boundings.Intersects(body.Boundings);
         }
 
         public bool Collides(string hitAreaKey, Rectangle area)
         {
-            return hitAreas[hitAreaKey].Intersects(area);
+            return GetHitArea(hitAreaKey).Intersects(area);
+        }
+
+        public bool Collides(string hitAreaKey, Body body)
+        {
+            return Collides(hitAreaKey, body.Boundings);
         }
 
         public bool Collides(string hitAreaKey, Body body, string bodyHitAreaKey)
         {
-            return hitAreas[hitAreaKey].Intersects(body.GetHitArea(bodyHitAreaKey));
+            return Collides(hitAreaKey, body.GetHitArea(bodyHitAreaKey));
         }
 
         public Rectangle GetHitArea(string key)
@@ -330,7 +335,7 @@ namespace TimbuGump.Entities
                     foreach (KeyValuePair<string, Rectangle> area in hitAreas)
                         spriteBatch.Draw(debugTexture, GetHitArea(area.Key), Color.Red);
                 else
-                    spriteBatch.Draw(debugTexture, Collision, Color.Red);
+                    spriteBatch.Draw(debugTexture, Boundings, Color.Red);
             }
         }
     }

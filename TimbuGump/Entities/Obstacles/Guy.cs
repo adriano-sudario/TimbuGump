@@ -3,12 +3,12 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using TimbuGump.Entities.Sprites;
 using TimbuGump.Helpers;
+using TimbuGump.Scenes;
 
 namespace TimbuGump.Entities.Obstacles
 {
     class Guy : Body
     {
-        private readonly float gravity = 0.2f;
         float forceApplied = -3f;
 
         public Guy(Vector2 position) : base(position, sprite: GetAnimationDefault(), scale: 5f)
@@ -31,7 +31,7 @@ namespace TimbuGump.Entities.Obstacles
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            forceApplied += gravity;
+            forceApplied += (SceneManager.CurrentScene as World).Gravity;
 
             MoveAndSlide(new Vector2(3f, forceApplied));
         }

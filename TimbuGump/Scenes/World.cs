@@ -16,9 +16,9 @@ namespace TimbuGump.Scenes
     {
         public List<Platform> Platforms { get; private set; }
         public Timbu Player { get; private set; }
-
-        private float gravity = 0.2f;
-        private readonly float maxGravityForce = 4.9f;
+        public float Gravity { get; private set; } = 0.2f;
+        
+        private readonly float maxGravityForce = 5f;
 
         public float ElapsedTime { get; set; }
 
@@ -32,12 +32,16 @@ namespace TimbuGump.Scenes
             SoundTrack.Load(Loader.LoadSound("Soundtrack\\timbu_beat"));
             SoundTrack.Play();
             Sfx.Load("pulo", Loader.LoadSound("SFX\\pulando"));
+            Sfx.Load("pegar_ar", Loader.LoadSound("SFX\\pegando_ar"));
+            Sfx.Load("afulibar_escada", Loader.LoadSound("SFX\\afulibando_escada"));
+            Sfx.Load("rodada", Loader.LoadSound("SFX\\rodando"));
 
             Platforms = new List<Platform>();
             Platforms.Add(new Platform());
             // AddPlatforms();
             Player = new Timbu(Vector2.Zero);
-            Player.MoveTo(new Vector2(25, Platforms.First().Position.Y - Player.Height));
+            Player.MoveTo(new Vector2(25, Player.Position.Y));
+            StepPlayerOnPlatform(Platforms.First());
         }
 
         public override void Update(GameTime gameTime)
@@ -51,7 +55,7 @@ namespace TimbuGump.Scenes
 
             if (Player.Ground == null)
             {
-                Player.ForceApplied += gravity;
+                Player.ForceApplied += Gravity;
 
                 if (Player.ForceApplied > maxGravityForce)
                     Player.ForceApplied = maxGravityForce;
@@ -69,16 +73,21 @@ namespace TimbuGump.Scenes
                     if (platform == Player.Ground)
                         continue;
 
-                    if (Player.CollidesWith(platform))
+                    if (Player.Collides("foot_area", platform))
                     {
-                        Player.Ground = platform;
-                        Player.MoveTo(new Vector2(Player.Position.X, platform.Position.Y - Player.Height));
+                        StepPlayerOnPlatform(platform);
                         break;
                     }
                 }
             }
 
             UpdatePlatforms();
+        }
+
+        private void StepPlayerOnPlatform(Platform platform)
+        {
+            Player.Ground = platform;
+            Player.MoveTo(new Vector2(Player.Position.X, platform.Position.Y - Player.Height));
         }
 
         private void UpdatePlatforms()

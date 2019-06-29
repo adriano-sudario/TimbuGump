@@ -120,6 +120,11 @@ namespace TimbuGump.Entities.Sprites
                 Play();
         }
 
+        public void JumpToFrame(int index)
+        {
+            currentFrameIndex = index;
+        }
+
         public List<string> GetAnimationNames()
         {
             List<string> names = new List<string>();

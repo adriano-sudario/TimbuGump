@@ -11,7 +11,7 @@ namespace TimbuGump.Entities
 {
     public class Platform : Body
     {
-        //private readonly float speed = 4f;
+        //private readonly float speed = 1f;
         private readonly float speed = 0;
         //private List<GuyOnStairs> guys = new List<GuyOnStairs>();
         private GuyOnStairs guyOnStairs;
@@ -104,7 +104,7 @@ namespace TimbuGump.Entities
 
         public override void Update(GameTime gameTime)
         {
-            MoveAndSlide(new Vector2(-speed, 0));
+            MoveAndSlide(new Vector2(-speed * Scale, 0));
             guyOnStairs?.Update(gameTime);
         }
 
