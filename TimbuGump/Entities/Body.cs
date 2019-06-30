@@ -281,7 +281,7 @@ namespace TimbuGump.Entities
             return Collides(hitAreaKey, body.GetHitArea(bodyHitAreaKey));
         }
 
-        public Rectangle GetHitArea(string key)
+        public virtual Rectangle GetHitArea(string key)
         {
             Rectangle hitArea = hitAreas[key];
             return new Rectangle((int)(hitArea.X + Position.X), (int)(hitArea.Y + Position.Y), hitArea.Width, hitArea.Height);

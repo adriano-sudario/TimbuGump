@@ -5,6 +5,7 @@ using TimbuGump.Entities.Sprites;
 using TimbuGump.Helpers;
 using TimbuGump.Inputs;
 using TimbuGump.Interfaces;
+using TimbuGump.Scenes;
 using TimbuGump.Sounds;
 
 namespace TimbuGump.Entities
@@ -20,6 +21,7 @@ namespace TimbuGump.Entities
         private float takeAirElapsedTime = 0;
 
         public bool HasTookAir { get; private set; } = false;
+        public bool IsAmbushed { get; set; } = false;
         public Platform Ground { get; set; }
         public float ForceApplied { get; set; }
 
@@ -27,7 +29,7 @@ namespace TimbuGump.Entities
         {
             AddHitArea("foot_area", 
                 new Rectangle((int)(3 * Scale), (int)(5 * Scale), (int)(3 * Scale), (int)(2 * Scale)));
-            AddHitArea("destroyer_area", 
+            AddHitArea("front_area", 
                 new Rectangle((int)(9 * Scale), (int)(1 * Scale), (int)(1 * Scale), (int)(5 * Scale)));
         }
 
@@ -58,6 +60,9 @@ namespace TimbuGump.Entities
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
+
+            if (IsAmbushed)
+                return;
 
             input.Update();
 

@@ -8,5 +8,6 @@ namespace TimbuGump.Interfaces
         Vector2 DirectionalPressing();
         bool InteractionJustPressed();
         bool EnterJustPressed();
+        bool BackspaceJustPressed();
     }
 }

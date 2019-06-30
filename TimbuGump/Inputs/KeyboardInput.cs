@@ -14,6 +14,7 @@ namespace TimbuGump.Inputs
         Keys upKey;
         Keys downKey;
         Keys interactionKey;
+        Keys backspaceKey;
 
         public KeyboardInput()
         {
@@ -27,6 +28,7 @@ namespace TimbuGump.Inputs
             upKey = Keys.Up;
             downKey = Keys.Down;
             interactionKey = Keys.Space;
+            backspaceKey = Keys.Back;
         }
 
         public void Update()
@@ -50,6 +52,11 @@ namespace TimbuGump.Inputs
         public bool EnterJustPressed()
         {
             return previousKeyboardState.IsKeyUp(Keys.Enter) && currentKeyboardState.IsKeyDown(Keys.Enter);
+        }
+
+        public bool BackspaceJustPressed()
+        {
+            return previousKeyboardState.IsKeyUp(backspaceKey) && currentKeyboardState.IsKeyDown(backspaceKey);
         }
     }
 }

@@ -15,10 +15,10 @@ namespace TimbuGump.Scenes
     public class World : Cyclic
     {
         public List<Platform> Platforms { get; private set; }
-        public Timbu Player { get; private set; }
+        public Timbu Player { get; set; }
         public float Gravity { get; private set; } = 0.2f;
-        
-        private readonly float maxGravityForce = 5f;
+
+        private readonly float maxGravityForce = 4.9f;
 
         public float ElapsedTime { get; set; }
 
@@ -29,8 +29,11 @@ namespace TimbuGump.Scenes
 
         private void Initialize()
         {
-            SoundTrack.Load(Loader.LoadSound("Soundtrack\\timbu_beat"));
-            SoundTrack.Play();
+            if (!SoundTrack.IsPlaying)
+            {
+                SoundTrack.Load(Loader.LoadSound("Soundtrack\\timbu_beat"));
+                SoundTrack.Play();
+            }
             Sfx.Load("pulo", Loader.LoadSound("SFX\\pulando"));
             Sfx.Load("pegar_ar", Loader.LoadSound("SFX\\pegando_ar"));
             Sfx.Load("afulibar_escada", Loader.LoadSound("SFX\\afulibando_escada"));
@@ -38,9 +41,9 @@ namespace TimbuGump.Scenes
 
             Platforms = new List<Platform>();
             Platforms.Add(new Platform());
-            // AddPlatforms();
+            AddPlatforms();
             Player = new Timbu(Vector2.Zero);
-            Player.MoveTo(new Vector2(25, Player.Position.Y));
+            Player.MoveTo(new Vector2(50, Player.Position.Y));
             StepPlayerOnPlatform(Platforms.First());
         }
 
@@ -50,6 +53,15 @@ namespace TimbuGump.Scenes
 
             foreach (Platform platform in Platforms)
                 platform.Update(gameTime);
+
+            UpdatePlayer(gameTime);
+            RebuildPlatforms();
+        }
+
+        private void UpdatePlayer(GameTime gameTime)
+        {
+            if (Player == null)
+                return;
 
             Player.Update(gameTime);
 
@@ -61,55 +73,77 @@ namespace TimbuGump.Scenes
                     Player.ForceApplied = maxGravityForce;
 
                 Player.MoveAndSlide(new Vector2(0, Player.ForceApplied));
-            }
 
-            if (Player.ForceApplied >= 0)
-            {
-                if (Player.Ground != null && !Player.CollidesWith(Player.Ground))
-                    Player.Ground = null;
-
-                foreach (Platform platform in Platforms)
+                if (Player.Position.Y + Player.Height > Global.ScreenHeight)
                 {
-                    if (platform == Player.Ground)
-                        continue;
-
-                    if (Player.Collides("foot_area", platform))
-                    {
-                        StepPlayerOnPlatform(platform);
-                        break;
-                    }
+                    KillPlayer();
+                    return;
                 }
             }
 
-            UpdatePlatforms();
+            if (Player.Ground != null && !Player.Collides("foot_area", Player.Ground))
+                Player.Ground = null;
+
+            foreach (Platform platform in Platforms)
+            {
+                if (platform.Position.X > Player.Position.X + platform.Width)
+                    break;
+
+                if (platform.HasGuy)
+                {
+                    if (Player.HasTookAir &&
+                        Player.Collides("front_area", platform.GuyOnStairs, "destroy_area"))
+                        platform.GuyOnStairs.Destroy();
+                    else if (!Player.IsAmbushed &&
+                        Player.Collides("front_area", platform.GuyOnStairs, "catch_area"))
+                        platform.GuyOnStairs.Ambush(Player);
+                    else if (Player.IsAmbushed && platform.GuyOnStairs.HasAmbushedPlayer &&
+                        Player.GetHitArea("front_area").Right >= platform.GuyOnStairs.GetHitArea("catch_area").Right)
+                    {
+                        platform.GuyOnStairs.CatchPlayer();
+                        return;
+                    }
+                }
+
+                if (platform == Player.Ground)
+                    continue;
+
+                if (Player.Collides("foot_area", platform))
+                {
+                    StepPlayerOnPlatform(platform);
+                    break;
+                }
+            }
         }
 
         private void StepPlayerOnPlatform(Platform platform)
         {
             Player.Ground = platform;
+            Player.ForceApplied = 0;
             Player.MoveTo(new Vector2(Player.Position.X, platform.Position.Y - Player.Height));
         }
 
-        private void UpdatePlatforms()
+        private void RebuildPlatforms()
         {
             CleanPlatforms();
             AddPlatforms();
         }
 
+        public void KillPlayer()
+        {
+            Player = null;
+            Sfx.Play("rodada");
+        }
+
         private void CleanPlatforms()
         {
-            int platformsToRemove = 0;
-
-            foreach (Platform platform in Platforms)
+            Platforms.RemoveAll(p =>
             {
-                if (platform.Position.X + platform.Width < 0)
-                    platformsToRemove++;
-                else
-                    break;
-            }
+                if (p.HasGuy && p.GuyOnStairs.HasBeenDestroyed)
+                    return p.GuyOnStairs.HasFallen && p.Position.X + p.Width < 0;
 
-            if (platformsToRemove > 0)
-                Platforms.RemoveRange(0, platformsToRemove);
+                return p.Position.X + p.Width < 0;
+            });
         }
 
         private void AddPlatforms()
@@ -138,7 +172,7 @@ namespace TimbuGump.Scenes
             foreach (Platform platform in Platforms)
                 platform.Draw(spriteBatch);
 
-            Player.Draw(spriteBatch);
+            Player?.Draw(spriteBatch);
         }
     }
 }

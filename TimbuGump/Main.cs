@@ -69,6 +69,9 @@ namespace TimbuGump
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            if (Keyboard.GetState().IsKeyDown(Keys.Back))
+                SceneManager.CurrentScene = new World();
+
             SceneManager.Update(gameTime);
 
             base.Update(gameTime);

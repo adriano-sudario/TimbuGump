@@ -14,6 +14,9 @@ namespace TimbuGump.Sounds
 
         public static void Load(string key, SoundEffect song)
         {
+            if (songs.ContainsKey(key))
+                return;
+
             songs.Add(key, song.CreateInstance());
         }
 

@@ -6,21 +6,21 @@ using System.Collections.Generic;
 using System.Threading;
 using TimbuGump.Entities.Obstacles;
 using TimbuGump.Entities.Sprites;
+using TimbuGump.Helpers;
+using TimbuGump.Scenes;
 
 namespace TimbuGump.Entities
 {
     public class Platform : Body
     {
-        //private readonly float speed = 1f;
-        private readonly float speed = 0;
+        private readonly float speed = 4f;
         //private List<GuyOnStairs> guys = new List<GuyOnStairs>();
-        private GuyOnStairs guyOnStairs;
+        public GuyOnStairs GuyOnStairs { get; private set; }
+        public bool HasGuy => GuyOnStairs != null;
 
-        public Platform() : base(Vector2.Zero, sprite: GetSprite())
+        public Platform() : base(Vector2.Zero, sprite: GetSprite(true))
         {
             MoveTo(new Vector2(0, Global.ScreenHeight * .5f));
-            guyOnStairs = new GuyOnStairs(Vector2.Zero);
-            guyOnStairs.MoveTo(new Vector2(300, Position.Y - guyOnStairs.Height));
         }
 
         public Platform(Platform lastPlatform) : base(Vector2.Zero, sprite: GetSprite())
@@ -44,13 +44,30 @@ namespace TimbuGump.Entities
                 position = GetPositionMiddle(lastPlatform);
 
             MoveTo(position);
+            GenerateGuy();
         }
 
-        private static Sprite GetSprite()
+        private void GenerateGuy()
         {
-            int[] possibleWidths = new int[] { 200, 400, 600, 800 };
-            //return new Sprite(Global.PlatformTexture, new Rectangle(0, 0, possibleWidths[Calc.Random(possibleWidths.Length)], 5));
-            return new Sprite(Global.PlatformTexture, new Rectangle(0, 0, possibleWidths[3], 5));
+            if (Calc.Random(2) == 0)
+                return;
+            
+            GuyOnStairs = new GuyOnStairs(Vector2.Zero);
+            GuyOnStairs.MoveTo(
+                new Vector2(Position.X + Calc.Random(65, Sprite.Width - 81), Position.Y - GuyOnStairs.Height));
+        }
+
+        private static Sprite GetSprite(bool isFirst = false)
+        {
+            int width = 800;
+
+            if (!isFirst)
+            {
+                int[] possibleWidths = new int[] { 200, 400, 600, 800 };
+                width = possibleWidths[Calc.Random(possibleWidths.Length)];
+            }
+            
+            return new Sprite(Global.PlatformTexture, new Rectangle(0, 0, width, 5));
         }
 
         private Vector2 GetPositionUp(Platform lastPlatform)
@@ -104,14 +121,24 @@ namespace TimbuGump.Entities
 
         public override void Update(GameTime gameTime)
         {
-            MoveAndSlide(new Vector2(-speed * Scale, 0));
-            guyOnStairs?.Update(gameTime);
+            bool isMoving = (SceneManager.CurrentScene as World).Player != null;
+
+            if (isMoving && Position.X + Width >= 0)
+                MoveAndSlide(new Vector2(-speed * Scale, 0));
+
+            if (HasGuy)
+            {
+                if (!GuyOnStairs.HasBeenDestroyed && isMoving)
+                    GuyOnStairs.MoveAndSlide(new Vector2(-speed * Scale, 0), false);
+
+                GuyOnStairs.Update(gameTime);
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             base.Draw(spriteBatch);
-            guyOnStairs?.Draw(spriteBatch);
+            GuyOnStairs?.Draw(spriteBatch);
         }
     }
 }
