@@ -6,7 +6,8 @@ namespace TimbuGump.Interfaces
     {
         void Update();
         Vector2 DirectionalPressing();
-        bool InteractionJustPressed();
+        bool SpaceJustPressed();
+        bool UpJustPressed();
         bool EnterJustPressed();
         bool BackspaceJustPressed();
     }

@@ -13,6 +13,7 @@ namespace TimbuGump
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Color backgroundColor = new Color(161, 212, 225);
 
         public Main()
         {
@@ -47,6 +48,8 @@ namespace TimbuGump
             Loader.Initialize(Content);
             Screen.Initialize(graphics, GraphicsDevice);
             Screen.Adjust(false);
+            Global.Monogram = Loader.LoadFont("monogram_extended");
+            SceneManager.AddScene("Opening", new Opening());
             SceneManager.AddScene("World", new World());
         }
 
@@ -69,9 +72,6 @@ namespace TimbuGump
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Back))
-                SceneManager.CurrentScene = new World();
-
             SceneManager.Update(gameTime);
 
             base.Update(gameTime);
@@ -83,7 +83,7 @@ namespace TimbuGump
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.White);
+            GraphicsDevice.Clear(backgroundColor);
 
             SceneManager.Draw(spriteBatch);
 

@@ -66,7 +66,7 @@ namespace TimbuGump.Entities
 
             input.Update();
 
-            if (input.InteractionJustPressed() && Ground != null && ForceApplied >= 0)
+            if (input.UpJustPressed() && Ground != null && ForceApplied >= 0)
             {
                 Sfx.Play("pulo");
                 Ground = null;
@@ -91,7 +91,7 @@ namespace TimbuGump.Entities
                 }
             }
 
-            if (input.EnterJustPressed() && canTakeAir)
+            if (input.SpaceJustPressed() && canTakeAir)
                 TakeAir();
         }
 

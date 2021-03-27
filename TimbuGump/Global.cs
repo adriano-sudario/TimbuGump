@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
 
 namespace TimbuGump
 {
@@ -11,5 +10,6 @@ namespace TimbuGump
         public static int ScreenWidth { get; set; }
         public static int ScreenHeight { get; set; }
         public static Texture2D PlatformTexture { get; set; }
+        public static SpriteFont Monogram { get; set; }
     }
 }

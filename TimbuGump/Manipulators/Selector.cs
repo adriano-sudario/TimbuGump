@@ -1,14 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
 using TimbuGump.Abstracts;
 using TimbuGump.Helpers;
 using TimbuGump.Inputs;
 using TimbuGump.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TimbuGump.Manipulators
 {
@@ -133,7 +130,7 @@ namespace TimbuGump.Manipulators
                 elapsedTime = 0;
             }
 
-            if (input.InteractionJustPressed() || input.EnterJustPressed())
+            if (input.SpaceJustPressed() || input.EnterJustPressed())
                 options.Find(o => o.IsHovered).OnSelected?.Invoke();
         }
 

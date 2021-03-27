@@ -1,13 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TimbuGump.Abstracts;
 using TimbuGump.Entities;
 using TimbuGump.Helpers;
-using TimbuGump.Manipulators;
+using TimbuGump.Inputs;
+using TimbuGump.Interfaces;
 using TimbuGump.Sounds;
 
 namespace TimbuGump.Scenes
@@ -17,17 +16,17 @@ namespace TimbuGump.Scenes
         public List<Platform> Platforms { get; private set; }
         public Timbu Player { get; set; }
         public float Gravity { get; private set; } = 0.2f;
+        public float Score { get; private set; }
 
+        private readonly IInput input = new KeyboardInput();
         private readonly float maxGravityForce = 4.9f;
+        private readonly float scoreIncrement = .2f;
+        private string deathText;
+        private Vector2 textPosition;
 
         public float ElapsedTime { get; set; }
 
-        public World()
-        {
-            Initialize();
-        }
-
-        private void Initialize()
+        public void Initialize()
         {
             if (!SoundTrack.IsPlaying)
             {
@@ -45,10 +44,27 @@ namespace TimbuGump.Scenes
             Player = new Timbu(Vector2.Zero);
             Player.MoveTo(new Vector2(50, Player.Position.Y));
             StepPlayerOnPlatform(Platforms.First());
+            Score = 0;
+            ElapsedTime = 0;
+            deathText = "";
+        }
+
+        private void SetDeathText(string text)
+        {
+            deathText = text;
+            Vector2 textSize = Global.Monogram.MeasureString(text) * 2;
+            textPosition = new Vector2(
+                (Global.ScreenWidth * .5f) - (textSize.X * .5f),
+                (Global.ScreenHeight * .8f) - (textSize.Y * .5f));
         }
 
         public override void Update(GameTime gameTime)
         {
+            input.Update();
+
+            if (Player == null && input.BackspaceJustPressed())
+                Initialize();
+
             ElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
 
             foreach (Platform platform in Platforms)
@@ -56,6 +72,9 @@ namespace TimbuGump.Scenes
 
             UpdatePlayer(gameTime);
             RebuildPlatforms();
+
+            if (Player != null)
+                Score += scoreIncrement;
         }
 
         private void UpdatePlayer(GameTime gameTime)
@@ -76,7 +95,7 @@ namespace TimbuGump.Scenes
 
                 if (Player.Position.Y + Player.Height > Global.ScreenHeight)
                 {
-                    KillPlayer();
+                    KillPlayer(false);
                     return;
                 }
             }
@@ -129,10 +148,11 @@ namespace TimbuGump.Scenes
             AddPlatforms();
         }
 
-        public void KillPlayer()
+        public void KillPlayer(bool hasBeenCatched = true)
         {
             Player = null;
             Sfx.Play("rodada");
+            SetDeathText(hasBeenCatched ? "you have been safely placed back into the wild" : "you have fallen");
         }
 
         private void CleanPlatforms()
@@ -173,6 +193,12 @@ namespace TimbuGump.Scenes
                 platform.Draw(spriteBatch);
 
             Player?.Draw(spriteBatch);
+            spriteBatch.DrawString(Global.Monogram, $"score: {((int)Score).ToString()}", new Vector2(10, 5), 
+                Color.Black, 0, Vector2.Zero, 2, SpriteEffects.None, 0);
+
+            if (!string.IsNullOrEmpty(deathText))
+                spriteBatch.DrawString(Global.Monogram, deathText, textPosition,
+                Color.Red, 0, Vector2.Zero, 2, SpriteEffects.None, 0);
         }
     }
 }
